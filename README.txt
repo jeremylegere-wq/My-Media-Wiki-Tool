@@ -168,31 +168,5 @@ Checking it works
   security checks, opens and publishes pages on a stand-in wiki, (the real wiki is never
   touched). No browser needed.
 
-
-
-Changes in version 3.2
-  Opening existing pages works all the way down. Boxes inside boxes, table
-  diagrams, hand-made emails and tables with merged or coloured cells keep
-  their exact look, and you can click any text in them to change it (Edit
-  wiki code / Show as layout switch between the two). Older side-by-side
-  boxes and arrow diagrams become Cards and Flow blocks. <nowiki> inside code
-  is read properly.
-  Fixed: list items starting or ending with a capital B or R lost that
-  letter on export ("Run the job" became "un the job"). Code boxes with
-  highlighted lines lost those lines when a page was opened. A picture's file
-  name was sometimes turned into a caption.
-
-Changes in version 3.1
-  Email threads come out in the Outlook style from the Wiki page templates
-  (modern layout) page. SQL code boxes use the full SSMS colours (numbers,
-  variables, functions and system objects). Underlined text passes Check.
-
-Changes from version 2
-  The four tabs (Page converter, Design elements, Images, Check and batch) are
-  replaced by the editor. Design elements are now blocks you add in the page,
-  the Images tab is the Picture block, converting a Word file or an email is in
-  the Open menu, and checking is built in. Converting a whole folder of files
-  at once is not in this version.
-
 Licence
   Add a LICENSE file before sharing this code.
