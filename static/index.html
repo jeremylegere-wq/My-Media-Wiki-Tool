@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wiki Style Tool</title>
+<link rel="stylesheet" href="/static/editor.css">
+</head>
+<body>
+<header class="app">
+  <div class="brand">
+    <div class="kick">Your Team &middot; Article editor</div>
+    <div class="name">Wiki Style Tool</div>
+  </div>
+  <nav class="actions">
+    <button id="bNew" title="Start a new page">New</button>
+    <div class="menu">
+      <button id="bOpen" aria-haspopup="true" title="Open a draft or bring in an existing page">Open &#9662;</button>
+      <div class="drop" id="openMenu" hidden>
+        <div class="dh">Your drafts</div>
+        <div id="draftList" class="draftlist"><div class="muted">No drafts saved yet.</div></div>
+        <div class="dh">Bring something in</div>
+        <button data-act="openFromWiki">A page on the wiki (by title)</button>
+        <button data-act="importWiki">Existing wiki page (paste its wikitext)</button>
+        <button data-act="importWord">Word document (.docx)</button>
+        <button data-act="importText">Plain text (paste)</button>
+        <button data-act="openFile">Draft file (.json)</button>
+        <button data-act="checkOnly">Check a page without editing it</button>
+        <div class="dh">Other tools</div>
+      </div>
+    </div>
+    <button id="bSave" title="Save a draft to the output\drafts folder (Ctrl+S)">Save draft</button>
+    <span class="sep"></span>
+    <button id="bUndo" class="icon" title="Undo (Ctrl+Z)" aria-label="Undo">&#8630;</button>
+    <button id="bRedo" class="icon" title="Redo (Ctrl+Y)" aria-label="Redo">&#8631;</button>
+    <span id="status" class="status" aria-live="polite"></span>
+    <button id="bCheck" class="check" title="See what still needs doing"><span id="checkCount">Check</span></button>
+    <button id="bWiki" class="wikibtn" title="Connect to the wiki to open and publish pages"><span class="dot"></span><span id="wikiLabel">Wiki</span></button>
+    <button id="bPublish" title="Publish this page to the wiki">Publish</button>
+    <button id="bExport" class="primary" title="Turn this page into wiki code">Export to wiki</button>
+  </nav>
+</header>
+
+<div class="shell">
+  <aside class="side" id="side">
+    <div class="tabs" role="tablist">
+      <button class="on" data-tab="tpl" role="tab">Templates</button>
+      <button data-tab="outline" role="tab">Outline</button>
+      <button data-tab="page" role="tab">Page</button>
+      <button data-tab="help" role="tab">Help</button>
+    </div>
+    <section class="pane" id="pane-tpl">
+      <input type="search" id="tplSearch" placeholder="Find a template" aria-label="Find a template">
+      <div id="tplList"></div>
+    </section>
+    <section class="pane" id="pane-outline" hidden>
+      <div class="muted small">Click a heading to jump to it.</div>
+      <div id="outline"></div>
+    </section>
+    <section class="pane" id="pane-page" hidden>
+      <label for="pgSummary">Search summary <span class="req">needed</span></label>
+      <textarea id="pgSummary" rows="4" placeholder="One or two plain sentences: what this page is and who it is for. It becomes the hidden first line that the wiki search shows."></textarea>
+      <div class="hint" id="sumHint"></div>
+      <label>Categories <span class="req">at least one</span></label>
+      <div id="catChips" class="chips"></div>
+      <select id="catPick" aria-label="Add a category"><option value="">Add a category&hellip;</option></select>
+      <div class="hint">Use the wiki's existing categories. A runbook also gets <b>Data Load Procedures</b>.</div>
+      <label class="chk"><input type="checkbox" id="pgToc" checked> Show the contents box (__TOC__)</label>
+      <div class="hint" id="tocHint" hidden>This page does not say. The wiki shows a contents box by itself when a page has four or more headings.</div>
+      <label for="pgFile">File name for downloads</label>
+      <input type="text" id="pgFile" readonly>
+      <div class="hint" id="tplInfo"></div>
+    </section>
+    <section class="pane" id="pane-help" hidden>
+      <h4>Writing on the page</h4>
+      <ul class="tips">
+        <li>Click anywhere on the page and type. It already looks the way it will on the wiki.</li>
+        <li><b>Grey italic text</b> is a prompt. Click it and type to replace it. Prompts you leave are not shown on the wiki: they become hidden TODO notes, and Check lists them.</li>
+        <li>Hover over a block and press <b>+</b> to add a block below it, or type <b>/</b> on an empty line.</li>
+        <li>Select a block to see its tools: colours, move, copy, delete, and extras like add row.</li>
+        <li>Drag a block by its <b>&#8942;&#8942;</b> handle to move it.</li>
+      </ul>
+      <h4>Keyboard</h4>
+      <table class="keys">
+        <tr><td>Ctrl+B / I / U</td><td>Bold, italic, underline</td></tr>
+        <tr><td>Ctrl+K</td><td>Add a link</td></tr>
+        <tr><td>Ctrl+E</td><td>Inline code</td></tr>
+        <tr><td>/</td><td>Insert a block (on an empty line)</td></tr>
+        <tr><td>Ctrl+Enter</td><td>Add another block like this one</td></tr>
+        <tr><td>Alt+&uarr; / Alt+&darr;</td><td>Move the block up or down</td></tr>
+        <tr><td>Tab</td><td>Next table cell (adds a row at the end)</td></tr>
+        <tr><td>Ctrl+Z / Ctrl+Y</td><td>Undo, redo</td></tr>
+        <tr><td>Ctrl+S</td><td>Save a draft</td></tr>
+      </table>
+      <h4>Opening and publishing on the wiki</h4>
+      <ul class="tips">
+        <li>Press <b>Wiki</b> to connect with your own bot password (YourWikiName@BotName, made at Special:BotPasswords). The tool uses it to log in and never saves it.</li>
+        <li><b>Open</b>, then <b>A page on the wiki</b>, to edit a page that is already there.</li>
+        <li><b>Publish</b> shows exactly what will change and what Check found, then saves the page under your name. A copy of the old version goes in <code>output\wiki_backups</code>.</li>
+        <li>If someone else changed the page after you opened it, the wiki refuses the save and the tool asks what to do.</li>
+      </ul>
+      <h4>Rules the export keeps for you</h4>
+      <ul class="tips">
+        <li>Hidden first line with the title and summary.</li>
+        <li>Contents box, house colours, headings and numbered steps.</li>
+        <li>No image widths. Pictures link to a full-size copy.</li>
+        <li>Check warns about passwords, sharing links, email addresses and phone numbers.</li>
+      </ul>
+      <div class="muted small" id="verInfo"></div>
+    </section>
+  </aside>
+
+  <main class="work" id="work">
+    <div class="fmt" id="fmt" role="toolbar" aria-label="Text formatting">
+      <button data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+      <button data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+      <button data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+      <button data-cmd="strikeThrough" title="Strike through"><s>S</s></button>
+      <button data-cmd="code" title="Inline code (Ctrl+E)" class="mono">&lt;/&gt;</button>
+      <span class="sep"></span>
+      <button data-cmd="link" title="Link to a wiki page or web address (Ctrl+K)">Link</button>
+      <div class="menu">
+        <button data-cmd="pillMenu" title="Insert a coloured status label">Status &#9662;</button>
+        <div class="drop" id="pillMenu" hidden></div>
+      </div>
+      <span class="sep"></span>
+      <button data-cmd="insertUnorderedList" title="Bullet list">&bull; List</button>
+      <button data-cmd="insertOrderedList" title="Numbered list">1. List</button>
+      <button data-cmd="removeFormat" title="Clear formatting">Clear</button>
+      <span class="sep"></span>
+      <button data-cmd="insert" class="ins" title="Insert a block (or type / on an empty line)">+ Insert</button>
+    </div>
+    <div class="paperwrap" id="paperwrap">
+      <article class="paper" id="paper">
+        <div class="ptitle pl" contenteditable="true" data-f="@title" data-hint="Page title" spellcheck="true"></div>
+        <div class="crumb" id="crumb"></div>
+        <div id="blocks"></div>
+        <button class="addend" id="addEnd">+ Add a block</button>
+        <div id="cats" class="catbar"></div>
+      </article>
+    </div>
+  </main>
+
+  <aside class="drawer" id="drawer" hidden aria-label="Export">
+    <div class="dhead">
+      <div class="tabs">
+        <button class="on" data-dtab="code">Wiki code</button>
+        <button data-dtab="check">Check <span id="dCount"></span></button>
+      </div>
+      <button class="icon" id="dClose" title="Close" aria-label="Close">&times;</button>
+    </div>
+    <div class="dpane" id="dpane-code">
+      <div class="dbar">
+        <button class="primary" id="dCopy">Copy</button>
+        <button id="dDownload">Download .txt</button>
+        <button id="dSaveTxt">Save to folder</button>
+        <a id="dWiki" target="_blank" rel="noopener">Open the wiki edit page &#8599;</a>
+      </div>
+      <div class="hint" id="dInfo"></div>
+      <textarea id="dText" readonly spellcheck="false" aria-label="Wiki code"></textarea>
+    </div>
+    <div class="dpane" id="dpane-check" hidden>
+      <div id="dIssues"></div>
+    </div>
+  </aside>
+</div>
+
+<div class="pop" id="insertPop" hidden role="menu">
+  <input type="search" id="insSearch" placeholder="Search blocks" aria-label="Search blocks">
+  <div id="insList"></div>
+</div>
+
+<div class="btools" id="btools" hidden></div>
+<div class="linktip" id="linkTip" hidden></div>
+
+<div class="modal" id="modal" hidden>
+  <div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="mhead"><h3 id="mTitle"></h3><button class="icon" id="mClose" aria-label="Close">&times;</button></div>
+    <div class="mbody" id="mBody"></div>
+    <div class="mfoot" id="mFoot"></div>
+  </div>
+</div>
+<input type="file" id="fileIn" hidden>
+<div class="toast" id="toast" hidden></div>
+<script src="/static/editor.js"></script>
+</body>
+</html>

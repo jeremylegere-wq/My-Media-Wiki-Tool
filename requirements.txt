@@ -1,0 +1,3 @@
+# Optional packages. The tool runs without them.
+#   py -m pip install -r requirements.txt
+extract-msg     # reading Outlook .msg emails

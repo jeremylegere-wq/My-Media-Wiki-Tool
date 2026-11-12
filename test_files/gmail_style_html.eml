@@ -1,0 +1,7 @@
+From: A <a@example.com>
+To: B <b@example.com>
+Subject: Hello
+Date: Tue, 6 Oct 2026 10:00:00 +1000
+Content-Type: text/html; charset=utf-8
+
+<html><body><p>Thanks, done.</p><ul><li>one</li><li>two</li></ul><div>On Mon, Oct 5, 2026 at 9:12 AM Bee &lt;b@example.com&gt; wrote:<br><blockquote>&gt; Please do it</blockquote></div></body></html>

@@ -1,0 +1,5 @@
+-- Check the load
+select * from [DW_KPI].[dbo].[tbl_ds_EXAMPLE] where ds_current_flag = 'Y' and ds_record_deleted = 'N'
+GO
+-- Fix the flag
+update [DW_KPI].[dbo].[tbl_ds_EXAMPLE] set ds_current_flag = 'N' where id = 1
